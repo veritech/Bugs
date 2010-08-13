@@ -1,0 +1,16 @@
+h1. CakePHP Annotation Plugin
+
+h2. What
+A solution for making textual notes on any record in your application
+
+h2. Why
+So you have a bunch of records, and you went to annotate them. Easy, make a comment model and go nuts. 
+But then you have you have another bunch of records that need annotating ... so just make another notes model.
+
+So now you have notesA and notesB, but then you have another model that needs ...
+
+I'm sure you see where this is going. So this is the solution, 
+a generic plugin to allow you to add annotations to any model with integer based primary key.
+
+h2. How
+Well it's magical you see, i could tell you, or you could clone the project and hack it to bits ^_^
