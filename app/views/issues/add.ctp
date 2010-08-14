@@ -8,7 +8,7 @@
 		echo $this->Form->input('status_id');
 		echo $this->Form->input('project_id');
 		echo $this->Form->input('version_id');
-		echo $this->Form->input('creator_id');
+		echo $this->Form->hidden('creator_id');
 		echo $this->Form->input('assigned_id');
 	?>
 	</fieldset>

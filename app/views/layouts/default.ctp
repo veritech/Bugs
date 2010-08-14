@@ -7,16 +7,19 @@
 			print $this->Html->css('blueprint/screen.css');
 			
 			print $this->Html->css('default.css');
+			
+			print $scripts_for_layout;
 		?>
 	</head>
 	<body>
 		<div class="container">
 			<div id="header" class="span-24 last">
-				<h1 class="prepend-1 span-16">Buggin'</h1>
-				<ul id="navigation" class="prepend-1 span-6 last">
+				<h1 class="prepend-1 span-14">Buggin'</h1>
+				<ul id="navigation" class="prepend-1 span-8 last">
+					<li><?php print $this->Html->link('Dashboard','/users/dashboard')?></li>					
 					<li><?php print $this->Html->link('Projects','/projects')?></li>
 					<li><?php print $this->Html->link('Issues','/issues')?></li>
-					<li><?php print $this->Html->link('Users','/users/dashboard')?></li>
+					<li><?php print $this->Html->link('Logout','/users/logout')?></li>
 				</ul>
 			</div>
 			<div id="body" class=" prepend-1 span-22 append-1">

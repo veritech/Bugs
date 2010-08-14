@@ -1,11 +1,12 @@
 <div class="projects index">
 	<h2><?php __('Projects');?></h2>
+	<small>All Projects (<?php print $this->Html->link('New Project','/projects/add')?>)</small>
 	<div class="list">
 	<?php
 	foreach ($projects as $project):
 		
 		printf(
-			'<div class="project">%s %s</div>',
+			'<div class="box"><span class="large">%s</span> <small>%s</small></div>',
 			$this->Html->link($project['Project']['name'],'/projects/view/'.$project['Project']['id']),
 			$this->Time->nice($project['Project']['created'])
 		);

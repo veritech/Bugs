@@ -11,3 +11,16 @@
 	
 	?>
 </div>
+
+<small>
+	<?php 
+	print $this->Html->link(
+		'Request Invite',
+		array(
+			'plugin'=>'invite',
+			'controller'=>'invites',
+			'action'=>'add'
+		)
+	); 
+	?>
+</small>

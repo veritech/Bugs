@@ -38,4 +38,39 @@
 		<hr />
 		<?php print $this->element('add',array('plugin'=>'Annotation','model'=>'Issue','fk'=>$issue['Issue']['id']))?>
 	</div>
+	<hr/>
+	<div class="history">
+		<small>Issue history</small>
+		<?php
+			if( count($diff['Issue']['revision_id']) < 1 ){
+				print '<div class="box large">No History</div>';
+			}
+		?>
+		<?php foreach( $diff['Issue']['revision_id'] as $key=>$val ): ?>
+			<?php
+			$output = array();
+			//print $diff['Issue']['revision_created'][$key];
+			//Title
+			if( is_array($diff['Issue']['title']) && array_key_exists($key,$diff['Issue']['title']) ){
+				$output[] = 'Title changed';
+			}
+			//description
+			if( is_array($diff['Issue']['description']) && array_key_exists($key,$diff['Issue']['description']) ){
+				$output[] = 'Description changed';
+			}
+			//status
+			if( is_array($diff['Issue']['status_id']) && array_key_exists($key,$diff['Issue']['status_id']) ){
+				$output[] = 'Status changed';
+			}
+			if( is_array($diff['Issue']['assigned_id']) && array_key_exists($key,$diff['Issue']['assigned_id']) ){
+				$output[] = 'Assigned changed'; 
+			}
+			
+			if( count($output) > 0 && array_key_exists($key,$diff['Issue']['revision_created']) && $diff['Issue']['revision_created'][$key] != null  ):
+			?>
+			<div class="box"><?php print $this->Time->nice( $diff['Issue']['revision_created'][$key]) .'<hr/>'. implode('<br/>',$output)?></div>
+			<?php endif;?>
+		<?php endforeach;?>
+		<?php //debug($diff)?>
+	</div>
 </div>

@@ -6,10 +6,10 @@
 			
 			print $this->Html->tableHeaders( array(
 				$this->Paginator->sort('Issue no.','id'),
-				$this->Paginator->sort('Project'),
-				$this->Paginator->sort('Title'),
+				$this->Paginator->sort('Project','project_id'),
+				$this->Paginator->sort('Title','title'),
 				$this->Paginator->sort('Assigned'),
-				$this->Paginator->sort('Status'),
+				$this->Paginator->sort('Status','status_id'),
 				$this->Paginator->sort('Created','created')
 				)
 			);

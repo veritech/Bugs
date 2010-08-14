@@ -8,6 +8,10 @@ div.container > div{
 	background:#fff;
 }
 
+#body{
+	padding-top:3em;
+	padding-bottom:3em;
+}
 /*
 	Navigation
 */
@@ -54,9 +58,9 @@ div.container #footer{
 /*
 	Issues
 */
-.issues.index td{
-	padding:0.5em;
-	border:thin solid #eee;
+.issues td{
+	padding:1em;
+	border:thin solid #fff;
 }
 
 /*
@@ -71,12 +75,16 @@ div.container #footer{
 .status-open{
 	background:#ecc;
 }
+.status-closed{
+	background:#ccc;
+}
 .status-unreproducible{
 	background:#eec;
 }
 .issues.view .clip{
 	width:100px;
 	padding:2em;
+	margin-top:-3em;
 	text-align:center;
 	float:right;
 	font-weight:bold;

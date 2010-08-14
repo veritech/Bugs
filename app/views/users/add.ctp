@@ -1,3 +1,6 @@
+<?php
+	$this->Javascript->link('jquery-1.4.2.min.js',false);
+?>
 <div class="users form">
 <?php echo $this->Form->create('User');?>
 	<fieldset>
@@ -10,10 +13,11 @@
 	</fieldset>
 <?php echo $this->Form->end(__('Submit', true));?>
 </div>
-<div class="actions">
-	<h3><?php __('Actions'); ?></h3>
-	<ul>
+<script type="text/javascript">
 
-		<li><?php echo $this->Html->link(__('List Users', true), array('action' => 'index'));?></li>
-	</ul>
-</div>
+$(function(){
+	//Clear the password form field
+	$('#UserPassword').val('');
+})
+
+</script>

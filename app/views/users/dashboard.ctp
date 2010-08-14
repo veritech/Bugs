@@ -40,7 +40,7 @@
 		endforeach;
 		?>
 	</div>
-	<div class="prepend-1 span-6">
+	<div class="prepend-1 span-6 append-1 last">
 		<h2>Updated Bugs</h2>
 		<?php
 		
