@@ -13,9 +13,10 @@ class VersionsController extends AppController {
 			$this->flash(__('Invalid version', true), array('action' => 'index'));
 		}
 		$this->set('version', $this->Version->read(null, $id));
+		$this->set('issues', $this->Version->Issue->findAllByVersionId($id));
 	}
 
-	function add() {
+	function add( $project_id = null ) {
 		if (!empty($this->data)) {
 			$this->Version->create();
 			if ($this->Version->save($this->data)) {
@@ -23,8 +24,11 @@ class VersionsController extends AppController {
 			} else {
 			}
 		}
-		$projects = $this->Version->Project->find('list');
-		$this->set(compact('projects'));
+		else{
+			$projects = $this->Version->Project->find('list',array('conditions'=>'Project.id = '.$project_id));
+			$this->set(compact('projects'));			
+		}
+
 	}
 
 	function edit($id = null) {

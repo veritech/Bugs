@@ -3,10 +3,16 @@ class User extends AppModel {
 	var $name = 'User';
 	var $displayField = 'username';
 	var $validate = array(
+		'username'=>array(
+			'alphanumeric' => array(
+				'rule' => array('alphanumeric'),
+				'message'=>'Letters and numbers only'
+			)
+		),
 		'email' => array(
 			'email' => array(
 				'rule' => array('email'),
-				//'message' => 'Your custom message here',
+				'message'=>'Invalid email address'
 				//'allowEmpty' => false,
 				//'required' => false,
 				//'last' => false, // Stop validation after this rule
@@ -16,7 +22,7 @@ class User extends AppModel {
 		'password' => array(
 			'alphanumeric' => array(
 				'rule' => array('alphanumeric'),
-				//'message' => 'Your custom message here',
+				'message'=>'Letters and numbers only'
 				//'allowEmpty' => false,
 				//'required' => false,
 				//'last' => false, // Stop validation after this rule

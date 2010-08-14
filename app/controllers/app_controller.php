@@ -23,7 +23,8 @@ class AppController extends Controller {
 		'Html', 
 		'Form',
 		'Gravatar',
-		'Time'
+		'Time',
+		'Javascript'
 	);
 
 /**
@@ -42,7 +43,13 @@ class AppController extends Controller {
  *
  * @access public
  */
-	function beforeFilter() {
+	function beforeFilter(){
+		//Set the login
+		$this->Auth->loginRedirect = array(
+			'plugin'=>false,
+			'controller'=>'users',
+			'action'=>'dashboard'
+		);
 	}
 
 /**

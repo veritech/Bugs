@@ -127,7 +127,17 @@ class RevisionBehavior extends ModelBehavior {
     	'ignore' => array(),
     	'useDbConfig' => null,
     	'model' => null
-    );    
+    );
+
+	/*
+		Allow for dynamic revision_id
+	*/
+   	public $version_pk = 'revision_id';
+	
+	/*
+		Allow for dynamic revision dates
+	*/
+	public $version_date = 'revision_created';
     /**
      * Old data, used to detect changes
      *
@@ -178,7 +188,7 @@ class RevisionBehavior extends ModelBehavior {
 			'contain' => $habtm
 		));
 		$Model->ShadowModel->create($data);
-		$Model->ShadowModel->set('version_created', date('Y-m-d H:i:s'));
+		$Model->ShadowModel->set($this->version_date, date('Y-m-d H:i:s'));
 		foreach ($habtm as $assocAlias) {
 			$foreign_keys = Set::extract($data,'/'.$assocAlias.'/'.$Model->{$assocAlias}->primaryKey);			
 			$Model->ShadowModel->set($assocAlias, implode(',',$foreign_keys));
@@ -213,15 +223,15 @@ class RevisionBehavior extends ModelBehavior {
 		}	
 		if (is_numeric($from_version_id) || is_numeric($to_version_id)) {
 			if (is_numeric($from_version_id) && is_numeric($to_version_id)) {
-				$conditions['version_id'] = array($from_version_id,$to_version_id);
+				$conditions[$this->version_pk] = array($from_version_id,$to_version_id);
 				if ($Model->ShadowModel->find('count',array('conditions'=>$conditions)) < 2) {
 					return false;
 				}
 			} else {
 				if (is_numeric($from_version_id)) {
-					$conditions['version_id'] = $from_version_id;					
+					$conditions[$this->version_pk] = $from_version_id;					
 				} else {
-					$conditions['version_id'] = $to_version_id;
+					$conditions[$this->version_pk] = $to_version_id;
 				}
 				if ($Model->ShadowModel->find('count',array('conditions'=>$conditions)) < 1) {
 					return false;
@@ -230,10 +240,10 @@ class RevisionBehavior extends ModelBehavior {
 		}
 		$conditions = array($Model->primaryKey 	=> $Model->id);		
 		if (is_numeric($from_version_id)) {
-			$conditions['version_id >='] = $from_version_id;			
+			$conditions[$this->version_pk.' >='] = $from_version_id;			
 		}
 		if (is_numeric($to_version_id)) {
-			$conditions['version_id <='] = $to_version_id;		
+			$conditions[$this->version_pk.' <='] = $to_version_id;		
 		}
 		$options['conditions'] = $conditions;
 		$all = $this->revisions($Model,$options,true);
@@ -319,7 +329,7 @@ class RevisionBehavior extends ModelBehavior {
 		$version_created = date('Y-m-d H:i:s');
 		foreach ($all as $data) {
 			$Model->ShadowModel->create($data);
-			$Model->ShadowModel->set('version_created', $version_created);
+			$Model->ShadowModel->set($this->version_date, $version_created);
 			$Model->ShadowModel->save();
 		}		
 	}
@@ -374,7 +384,7 @@ class RevisionBehavior extends ModelBehavior {
 		} else {
 			$options['conditions'] = array( $Model->primaryKey => $Model->id);	
 		}			
-		$options['order'] = 'version_created ASC, version_id ASC';
+		$options['order'] = $this->version_date.' ASC, '.$this->version_pk.' ASC';
 		return $Model->ShadowModel->find('first',$options);
 	}
 
@@ -435,11 +445,11 @@ class RevisionBehavior extends ModelBehavior {
 		$allIds = Set::extract($all,'/'.$Model->alias.'/'.$Model->primaryKey);		
 		
 		$cond = $options['conditions'];
-		$cond['version_created <'] = $options['date'];
+		$cond[$this->version_date.' <'] = $options['date'];
 		$created_before_date = $Model->ShadowModel->find('all',array(
 			'order' => $Model->primaryKey,
 			'conditions' => $cond,
-			'fields' => array('version_id',$Model->primaryKey)
+			'fields' => array($this->version_pk,$Model->primaryKey)
 		)); 
 		$created_before_dateIds = Set::extract($created_before_date,'/'.$Model->alias.'/'.$Model->primaryKey);
 			
@@ -448,12 +458,12 @@ class RevisionBehavior extends ModelBehavior {
 		// delete all Model rows where there are only version_created later than date
 		$Model->deleteAll(array($Model->alias.'.'.$Model->primaryKey => $deleteIds),false,true);
 		
-		unset($cond['version_created <']);
-		$cond['version_created >='] = $options['date'];
+		unset($cond[$this->version_date.' <']);
+		$cond[$this->version_date.' >='] = $options['date'];
 		$created_after_date = $Model->ShadowModel->find('all',array(
 			'order' => $Model->primaryKey,
 			'conditions' => $cond,
-			'fields' => array('version_id',$Model->primaryKey)
+			'fields' => array($this->version_pk,$Model->primaryKey)
 		)); 
 		$created_after_dateIds = Set::extract($created_after_date,'/'.$Model->alias.'/'.$Model->primaryKey);
 		$updateIds = array_diff($created_after_dateIds,$deleteIds);
@@ -486,7 +496,7 @@ class RevisionBehavior extends ModelBehavior {
 			trigger_error('RevisionBehavior: ShadowModel doesnt exist.', E_USER_WARNING); 
             return false;
 		}   
-		$data = $Model->ShadowModel->find('first',array('conditions'=>array('version_id'=>$version_id)));	
+		$data = $Model->ShadowModel->find('first',array('conditions'=>array($this->version_pk=>$version_id)));	
 		if ($data == false) {
 			return false;
 		}
@@ -561,9 +571,9 @@ class RevisionBehavior extends ModelBehavior {
 		$data = $Model->ShadowModel->find('first',array(
 			'conditions'=>array(
 				$Model->primaryKey => $Model->id,
-				'version_created <='=>$datetime
+				$this->version_date.' <='=>$datetime
 			),
-			'order'=>'version_created ASC, version_id ASC'
+			'order'=>$this->version_date.' ASC, '.$this->version_pk.' ASC'
 		));
 		/* If no previous version was found and revertToDate() was called with force_delete, then delete the live data, else leave it alone */
 		if ($data == false) {
@@ -619,7 +629,7 @@ class RevisionBehavior extends ModelBehavior {
 		$auto = $this->settings[$Model->alias]['auto'];
 		$this->settings[$Model->alias]['auto'] = false;
 		$Model->ShadowModel->create($data,true);
-		$Model->ShadowModel->set('version_created', date('Y-m-d H:i:s'));
+		$Model->ShadowModel->set($this->version_date, date('Y-m-d H:i:s'));
 		$Model->ShadowModel->save();
 		$Model->version_id = $Model->ShadowModel->id;
 		$success =  $Model->save($data);
@@ -653,8 +663,8 @@ class RevisionBehavior extends ModelBehavior {
 			$options['conditions'] = array($Model->alias.'.'.$Model->primaryKey => $Model->id);	
 		}	
 		if ( $include_current == false ) {
-            $current = $this->newest($Model, array('fields'=>array($Model->alias.'.version_id',$Model->primaryKey)));
-            $options['conditions'][$Model->alias.'.version_id !='] = $current[$Model->alias]['version_id'];
+            $current = $this->newest($Model, array('fields'=>array($Model->alias.'.'.$this->version_pk,$Model->primaryKey)));
+            $options['conditions'][$Model->alias.'.'.$this->version_pk.' !='] = $current[$Model->alias][$this->version_pk];
 		}	
 		return $Model->ShadowModel->find('all',$options);
 	}
@@ -803,7 +813,7 @@ class RevisionBehavior extends ModelBehavior {
 		if ($created) {
 			$Model->ShadowModel->create($Model->data,true);
 			$Model->ShadowModel->set('id',$Model->id);
-			$Model->ShadowModel->set('version_created',date('Y-m-d H:i:s'));
+			$Model->ShadowModel->set($this->version_date,date('Y-m-d H:i:s'));
 			foreach ($Model->data as $alias => $alias_data) {
 				if (isset($Model->ShadowModel->_schema[$alias])) {
 					if (isset($alias_data[$alias]) && !empty($alias_data[$alias])) {
@@ -865,14 +875,14 @@ class RevisionBehavior extends ModelBehavior {
    		if (!$changeDetected) {
    			return true;
    		}
-		$Model->ShadowModel->set('version_created', date('Y-m-d H:i:s'));
+		$Model->ShadowModel->set($this->version_date, date('Y-m-d H:i:s'));
 		$Model->ShadowModel->save();
 		$Model->version_id = $Model->ShadowModel->id;
 		if (is_numeric($this->settings[$Model->alias]['limit'])) {
             $conditions = array('conditions'=>array($Model->alias.'.'.$Model->primaryKey => $Model->id));
 			$count = $Model->ShadowModel->find('count', $conditions);
 			if ($count > $this->settings[$Model->alias]['limit']) {
-                $conditions['order'] = $Model->alias.'.version_created ASC, '.$Model->alias.'.version_id ASC';
+                $conditions['order'] = $Model->alias.'.'.$this->version_date.' ASC, '.$Model->alias.'.'.$this->version_pk.' ASC';
 				$oldest = $Model->ShadowModel->find('first',$conditions);
 				$Model->ShadowModel->id = null;
 				$Model->ShadowModel->del($oldest[$Model->alias][$Model->ShadowModel->primaryKey]);	
@@ -978,8 +988,8 @@ class RevisionBehavior extends ModelBehavior {
       $Model->ShadowModel->tablePrefix = $Model->tablePrefix;
     }
 		$Model->ShadowModel->alias = $Model->alias;
-		$Model->ShadowModel->primaryKey = 'version_id';
-		$Model->ShadowModel->order = 'version_created DESC, version_id DESC';
+		$Model->ShadowModel->primaryKey = $this->version_pk;
+		$Model->ShadowModel->order = $this->version_date.' DESC, '.$this->version_pk.' DESC';
 		return true;
 	}
 

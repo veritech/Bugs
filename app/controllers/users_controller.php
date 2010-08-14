@@ -24,7 +24,7 @@ class UsersController extends AppController {
 	}
 	
 	function logout(){
-		
+		$this->redirect($this->Auth->logout());
 	}
 	
 	/*
@@ -75,11 +75,17 @@ class UsersController extends AppController {
 		$this->set('user', $this->User->read(null, $id));
 	}
 
-	function add() {
+	function add( $hash = null ) {
+		
+		if( !($hash == 'mchat' ) ){
+			$this->flash('Invalid invite code','/');
+		}
+		
 		if (!empty($this->data)) {
 			$this->User->create();
 			if ($this->User->save($this->data)) {
-				$this->flash(__('User saved.', true), array('action' => 'index'));
+				$this->Auth->login($this->data);
+				$this->flash(__('User Created.', true), array('action' => 'dashboard'));
 			} else {
 			}
 		}
