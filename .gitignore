@@ -2,3 +2,6 @@
 /app/tmp
 /plugins
 /vendors
+/config
+Capfile
+
