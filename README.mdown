@@ -1,5 +1,5 @@
-h2. Bugs
+**Bugs**
 
-h3. A Lightweight issue tracker
+**A Lightweight issue tracker**
 
 Track some bugs with support for launch small closed beta programs
