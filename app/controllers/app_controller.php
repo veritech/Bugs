@@ -35,7 +35,13 @@ class AppController extends Controller {
  * @access public
  */
 	var $components = array(
-		'Auth'
+		'Auth'=> array(
+			'loginRedirect'=> array(
+				'plugin'=>false,
+				'controller'=>'users',
+				'action'=>'dashboard'
+			)
+		)
 	);
 
 /**
@@ -44,12 +50,12 @@ class AppController extends Controller {
  * @access public
  */
 	function beforeFilter(){
-		//Set the login
-		$this->Auth->loginRedirect = array(
-			'plugin'=>false,
-			'controller'=>'users',
-			'action'=>'dashboard'
-		);
+		// //Set the login
+		// $this->Auth->loginRedirect = array(
+		// 	'plugin'=>false,
+		// 	'controller'=>'users',
+		// 	'action'=>'dashboard'
+		// );
 	}
 
 /**
